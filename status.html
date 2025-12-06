@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functions Status - NIKO PYTHON Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        /* ========================================= */
+        /* 1. ÜMUMİ VƏ ARXA FON STİLLƏRİ */
+        /* ========================================= */
+        body {
+            background: #121212; 
+            background-image: url('images/particle_overlay.png'); 
+            background-repeat: no-repeat;
+            background-size: cover; 
+            background-attachment: fixed;
+            background-position: center;
+            color: #e0e0e0; 
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh; 
+            position: relative;
+        }
+
+        .container {
+            /* PC Mərkəzləşdirməsi və Mobil Uyğunluğu */
+            max-width: 900px; 
+            width: 90%; 
+            text-align: center;
+            margin: 0 auto; 
+            padding: 20px 0;
+            box-sizing: border-box; 
+        }
+        
+        /* 2. SOSİAL SİDEBAR STİLİ */
+        .social-sidebar {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            z-index: 1000;
+        }
+        .social-sidebar a {
+            background: #121212;
+            color: #bb86fc;
+            padding: 10px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 24px; 
+            font-weight: normal; 
+            width: 44px; 
+            height: 44px; 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #bb86fc;
+        }
+        .social-sidebar a:hover {
+            transform: scale(1.1);
+            background: #bb86fc; 
+            color: #121212;
+        }
+        
+        /* 3. STATUS QUTULARI ÜÇÜN STİL */
+        .status-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap; 
+        }
+        .status-box {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            width: 150px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 0, 0, 0.5); 
+            border: none;
+            transition: all 0.3s ease;
+            flex-grow: 1; 
+            max-width: 150px;
+        }
+        .status-box p {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .safe {
+            color: #03dac6; 
+            box-shadow: 0 0 10px rgba(3, 218, 198, 0.6), 0 0 20px rgba(3, 218, 198, 0.4), inset 0 0 5px rgba(3, 218, 198, 0.3);
+        }
+        .risk {
+            color: #ffcc00; 
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.6), 0 0 20px rgba(255, 204, 0, 0.4), inset 0 0 5px rgba(255, 204, 0, 0.3);
+        }
+        .test {
+            color: #bb86fc; 
+            box-shadow: 0 0 10px rgba(187, 134, 252, 0.6), 0 0 20px rgba(187, 134, 252, 0.4), inset 0 0 5px rgba(187, 134, 252, 0.3);
+        }
+        
+        /* 4. AKORDEON VƏ FUNKSİYA SİYAHISI */
+        .panel-status-block {
+            background: #1e1e1e;
+            border-radius: 15px;
+            margin: 20px 0;
+            cursor: pointer;
+            text-align: left;
+            padding: 15px 25px;
+            transition: background 0.3s ease;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: 1px solid transparent;
+            box-shadow: 0 0 5px rgba(187, 134, 252, 0.3), inset 0 0 5px rgba(0, 0, 0, 0.5); 
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            background: #1e1e1e; 
+            border-radius: 0 0 15px 15px;
+        }
+        .accordion-content.active {
+            max-height: 500px; 
+            padding: 15px 25px;
+        }
+        .function-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .function-list li {
+            padding: 8px 0;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: left;
+            border-bottom: 1px solid #2c2c2c;
+            position: relative;
+            padding-left: 20px;
+            color: #e0e0e0; 
+        }
+        .function-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .function-list li.safe::before { background: #00ff00; }
+        .function-list li.risk::before { background: #ff0000; }
+        .function-list li.test::before { background: #ffcc00; }
+        .accordion-header { cursor: pointer; user-select: none; }
+
+
+        /* 5. TRIAL KEY VƏ UPDATE BLOKLARI */
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-top: 40px;
+        }
+        .trial-key-block { 
+            background: #1e1e1e; 
+            border-radius: 15px; 
+            padding: 20px; 
+            flex: 1; 
+            border: 1px solid #3a0050; 
+        }
+        .update-block { 
+            background: #1e1e1e; 
+            border-radius: 15px; 
+            padding: 20px; 
+            width: 300px; 
+            max-width: 300px;
+            border: 1px solid #03dac6; 
+            text-align: left; 
+            color: white; 
+            box-sizing: border-box;
+        }
+
+        .trial-key-block h4 { 
+            color: #bb86fc; 
+            margin-bottom: 15px; 
+            font-size: 16px; 
+        }
+        .claim-btn, .copy-btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background 0.3s;
+        }
+        .claim-btn { 
+            background: #bb86fc; 
+            color: black; 
+            margin-right: 10px; 
+        }
+        .copy-btn { 
+            background: #333; 
+            color: white; 
+        }
+        .update-block ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .update-block ul li { 
+            margin-bottom: 8px; 
+            color: #e0e0e0; 
+        }
+
+        /* 6. YÜKLƏMƏLƏR PANELİ STİLİ */
+        .downloads-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 15px; 
+            width: 100%; 
+            margin: 0 auto; 
+        }
+        .download-item {
+            background: #1e1e1e;
+            color: #03dac6; 
+            text-decoration: none;
+            padding: 20px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            border: 1px solid #03dac6;
+        }
+        .download-item:hover {
+            background: #03dac6;
+            color: #121212;
+        }
+        .download-item i {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .download-item span {
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        /* 7. XOŞBƏXT MÜŞTƏRİLƏR (RƏYLƏR) STİLİ */
+        .reviews-section {
+            margin-top: 50px;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .reviews-title {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 25px;
+        }
+        .rating-display {
+            font-size: 24px; 
+            color: #ffcc00; 
+            margin-bottom: 20px;
+            display: block;
+        }
+        .review-box {
+            background: #1e1e1e;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 15px;
+            max-width: 400px; 
+            text-align: left;
+            border-left: 3px solid #03dac6;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+        .review-text {
+            color: #e0e0e0;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .review-author {
+            color: #03dac6; 
+            font-weight: bold;
+            text-align: right;
+            font-size: 15px;
+        }
+
+        /* 8. SÜRÜŞMƏ ŞƏKİLLƏRİ ANİMASİYASI */
+        .scrolling-images-container {
+            overflow: hidden; 
+            margin: 30px auto 0 auto;
+            max-width: 100%; 
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            background: #1e1e1e;
+            padding: 10px 0;
+        }
+
+        .scrolling-images {
+            display: flex;
+            width: fit-content; 
+            animation: scroll-right 30s linear infinite; 
+        }
+
+        .scroll-image {
+            width: 200px; 
+            height: 150px; 
+            margin: 0 5px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Əsas Animasiya (Sağa sürüşmə) */
+        @keyframes scroll-right {
+            0% {
+                transform: translateX(0); 
+            }
+            100% {
+                transform: translateX(-50%); 
+            }
+        }
+        
+        /* ========================================= */
+        /* 💥 MOBİL UYĞUNLUQ (RESPONSIVE) CSS */
+        /* ========================================= */
+
+        /* 650px və aşağısı üçün (orta tablet və böyük mobil) */
+        @media (max-width: 650px) {
+            
+            /* 1. Flex Konteyneri alt-alta düşürdük */
+            .flex-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            /* Update blokuna bütün eni verdik */
+            .update-block {
+                width: 100%;
+                max-width: none;
+            }
+            
+            /* Trial Key bloku da bütün eni tutur */
+            .trial-key-block {
+                flex: none;
+                width: 100%;
+            }
+            
+            /* 2. Yükləmələr gridi iki sütuna keçirildi */
+            .downloads-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px;
+            }
+        }
+
+        /* 450px və aşağısı üçün (kiçik mobil telefonlar) */
+        @media (max-width: 450px) {
+            
+            .container {
+                width: 98%; 
+                padding: 10px 0;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            /* 3. Status qutularını daha da kiçiltdik */
+            .status-grid {
+                justify-content: space-between;
+                gap: 5px;
+            }
+            .status-box {
+                width: 30%; 
+                max-width: 100px;
+                padding: 15px 5px;
+            }
+            .status-box i {
+                font-size: 20px;
+            }
+            .status-box p {
+                font-size: 13px;
+            }
+            
+            /* 4. Yükləmələr gridi tək sütuna keçirildi */
+            .downloads-grid { 
+                grid-template-columns: 1fr; 
+            }
+            
+            /* Sosial sidebarı kiçiltdik */
+            .social-sidebar {
+                right: 0;
+                gap: 5px;
+            }
+            .social-sidebar a {
+                width: 35px; 
+                height: 35px; 
+                font-size: 18px; 
+            }
+            
+            /* Buton qrupunu kiçik ekranda tənzimləmək */
+            .trial-key-block > div {
+                 flex-direction: column;
+                 align-items: center;
+            }
+            .claim-btn {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            .copy-btn {
+                width: 100%;
+            }
+            .trial-key-block p {
+                margin-bottom: 5px !important; 
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="social-sidebar">
+        <a href="https://discord.gg/YOUR_DISCORD_INVITE" title="Discord">
+            <i class="fab fa-discord"></i>
+        </a> 
+        <a href="https://youtube.com/yourchannel" title="YouTube">
+            <i class="fab fa-youtube"></i>
+        </a> 
+        <a href="https://tiktok.com/yourprofile" title="TikTok">
+            <i class="fab fa-tiktok"></i>
+        </a>
+    </div>
+    <div class="container">
+        
+        <h1 style="color: white; margin-bottom: 50px;">⚡ Funksiyalar Vəziyyəti</h1>
+
+        <div class="status-grid">
+            <div class="status-box safe"><i class="fas fa-check-circle"></i><p>SAFE</p></div>
+            <div class="status-box risk"><i class="fas fa-exclamation-triangle"></i><p>RISK</p></div>
+            <div class="status-box test"><i class="fas fa-flask"></i><p>TEST</p></div>
+        </div>
+        
+        <div class="accordion-item">
+            <div class="panel-status-block accordion-header" onclick="toggleAccordion('internal-content')">
+                ▶ PANEL INTERNAL
+            </div>
+            <div id="internal-content" class="accordion-content">
+                <ul class="function-list">
+                    <li class="safe">Aimbot Sight</li><li class="risk">Aimbot Rage</li><li class="safe">Aimbot Silent</li>
+                    <li class="safe">Aimbot External</li><li class="safe">Avoid Fallen</li><li class="safe">Draw Fov</li>
+                    <li class="safe">Mouse Aimbot</li><li class="safe">All Esp</li><li class="safe">All Chams</li>
+                    <li class="safe">Steady Aim</li><li class="risk">Infinite Ammo</li><li class="risk">Camera Hack</li>
+                    <li class="risk">AimLock</li><li class="risk">Fast Switch</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="accordion-item" style="margin-top: 20px;">
+            <div class="panel-status-block accordion-header" onclick="toggleAccordion('fake-lag-content')">
+                ▶ PANEL FAKE LAG
+            </div>
+            <div id="fake-lag-content" class="accordion-content">
+                <ul class="function-list">
+                    <li class="safe">Freeze Enemy</li>
+                    <li class="safe">Ghost Hack</li>
+                    <li class="safe">Telekill Infinite</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flex-container">
+            <div class="trial-key-block">
+                <p id="trialStatus" style="color: #ff0000; font-weight: bold; margin-bottom: 5px;">Internal Free Trial Key - Ended</p>
+                <h4 id="timerDisplay" style="color: #bb86fc; margin-bottom: 15px; font-size: 16px;">00:00:00</h4>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <p style="color: #bb86fc; margin-bottom: 10px;">— CLAIM NOW —</p>
+                    <div>
+                        <button class="claim-btn" id="claimBtn">Claim</button>
+                        <button class="copy-btn" id="copyBtn">Copy</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="update-block">
+                <p style="color: #03dac6; font-weight: bold; margin-bottom: 10px;">Update — 14 Nov 2025</p>
+                <ul>
+                    <li>• Added Enemy Pull</li><li>• Added Fast Switch</li><li>• Added Hyper Speed</li>
+                    <li>• Added Camera Hack</li><li>• Updated for OB51</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h2 style="color: white; margin-top: 50px; margin-bottom: 20px;">Yükləmələr Paneli</h2>
+        <p style="color: #e0e0e0; margin-bottom: 30px; font-size: 16px;">Panellərinizə və resurslarınıza dərhal daxil olun.</p>
+
+        <div class="downloads-grid">
+            <a href="fayllar/NIKO NO.exe" class="download-item" download="NIKO NO.exe">
+                <i class="fas fa-file-code"></i><span>Daxili Panel</span>
+            </a>
+            
+            <a href="fayllar/NIKO DEVOLOPER.exe" class="download-item" download="NIKO DEVOLOPER.exe">
+                <i class="fas fa-magic"></i><span>Saxta gecikmə paneli</span>
+            </a>
+            
+            <a href="fayllar/derslik.pdf" class="download-item" download="Derslik.pdf">
+                <i class="fas fa-book-open"></i><span>Dərslik Paneli</span>
+            </a>
+            
+            <a href="fayllar/MSI 5.9.300.6315.exe" class="download-item" download="MSI 5.9.300.6315.exe">
+                <i class="fas fa-tablet-alt"></i><span>Bluestacks Quraşdırma</span>
+            </a>
+            
+            <a href="fayllar/teleb_fayli.zip" class="download-item" download="Teleb_Fayli.zip">
+                <i class="fas fa-download"></i><span>Tələb fayli</span>
+            </a>
+            
+            <a href="fayllar/temiz_emulator.exe" class="download-item" download="Temiz_Emulator.exe">
+                <i class="fas fa-broom"></i><span>Təmiz emulator</span>
+            </a>
+        </div>
+        
+        <div class="reviews-section">
+            <h2 class="reviews-title">Xoşbəxt müştərilər</h2>
+
+            <p class="rating-display">🌟🌟🌟🌟 <span style="font-size: 14px; color: #e0e0e0;">4.3/5.0 — 510 rəy</span></p>
+
+            <div class="review-box">
+                <p class="review-text">"Mən bu məhsulu sıfır gözlənti ilə aldım və o, məni bütün mümkün yollarla heyrətə gətirdi. İndi al!"</p>
+                <p class="review-author">- ! Sako Forever ✔</p>
+            </div>
+            
+            <div class="scrolling-images-container">
+                <div class="scrolling-images track">
+                    <img src="images/nik.png" alt="Müştəri 1" class="scroll-image">
+                    <img src="images/nikoo.png" alt="Müştəri 2" class="scroll-image">
+                    <img src="images/nik.png" alt="Müştəri 3" class="scroll-image">
+                    <img src="images/8797.jpg" alt="Müştəri 4" class="scroll-image">
+                    
+                    <img src="images/3439.jpg" alt="Müştəri 1" class="scroll-image">
+                    <img src="images/nikoo.png" alt="Müştəri 2" class="scroll-image">
+                    <img src="images/nik.png" alt="Müştəri 3" class="scroll-image">
+                    <img src="images/8797.jpg" alt="Müştəri 4" class="scroll-image">
+                </div>
+            </div>
+        </div> 
+        
+    </div> 
+
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/693423c537fc4e197cdb7b5c/1jbpqnfb6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    
+    <script>
+        // Akordeonu açma/bağlama funksiyası
+        function toggleAccordion(contentId) {
+            const content = document.getElementById(contentId);
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+            } else {
+                content.classList.add('active');
+            }
+        }
+        
+        // KOPYALAMA FUNKSİYASI
+        const KEY_TO_COPY = "1999X-FREEFIRE-TRIAL-KEY-001"; // ❗ ÖZ KEYİNİZİ BURAYA YAZIN
+        const copyButton = document.getElementById('copyBtn');
+
+        if (copyButton) {
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(KEY_TO_COPY).then(() => {
+                    copyButton.innerHTML = 'Kopyalandı ✅';
+                    setTimeout(() => {
+                        copyButton.innerHTML = 'Copy';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Kopyalama uğursuz oldu: ', err);
+                    alert('Kopyalama uğursuz oldu! Saytın HTTPS olduğundan əmin olun.');
+                });
+            });
+        }
+    </script>
+    
+    <script>
+        const CLAIM_BUTTON = document.getElementById('claimBtn');
+        const TIMER_DISPLAY = document.getElementById('timerDisplay');
+        const TRIAL_STATUS = document.getElementById('trialStatus');
+        const TRIAL_DURATION_MS = 24 * 60 * 60 * 1000; // 24 saat
+
+        function updateTimer(endTime) {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            if (distance < 0) {
+                if (TIMER_DISPLAY && TIMER_DISPLAY.interval) clearInterval(TIMER_DISPLAY.interval);
+                if (TIMER_DISPLAY) TIMER_DISPLAY.innerHTML = "00:00:00";
+                if (TRIAL_STATUS) TRIAL_STATUS.innerHTML = "Internal Free Trial Key - Ended 🛑";
+                if(CLAIM_BUTTON) CLAIM_BUTTON.disabled = false;
+                localStorage.removeItem('claimEndTime');
+                return;
+            }
+
+            const hours = Math.floor(distance / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            if (TIMER_DISPLAY) {
+                TIMER_DISPLAY.innerHTML = 
+                    `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+            
+            if (TRIAL_STATUS) TRIAL_STATUS.innerHTML = "Internal Free Trial Key - ACTIVE ✅";
+            if(CLAIM_BUTTON) CLAIM_BUTTON.disabled = true;
+        }
+
+        function startClaimProcess(endTime) {
+            if (TIMER_DISPLAY && TIMER_DISPLAY.interval) clearInterval(TIMER_DISPLAY.interval);
+            
+            if (TIMER_DISPLAY) {
+                TIMER_DISPLAY.interval = setInterval(() => updateTimer(endTime), 1000);
+                updateTimer(endTime); 
+            }
+        }
+
+        window.onload = () => {
+            const storedEndTime = localStorage.getItem('claimEndTime');
+            if (storedEndTime && CLAIM_BUTTON) {
+                startClaimProcess(parseInt(storedEndTime));
+            }
+        };
+    </script>
+    
+</body>
+</html>

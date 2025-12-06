@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>NIKO PYTHON Store - Free Fire Panel</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <script src="https://js.stripe.com/v3/"></script> 
+    
+    <style>
+        /* ========================================= */
+        /* 1. ÜMUMİ VƏ ARXA FON STİLLƏRİ */
+        /* ========================================= */
+        body {
+            background: #121212;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            position: relative;
+            margin: 0; 
+            padding: 0;
+            
+            /* CSS Qradiyent Overlay */
+            background-image: 
+                radial-gradient(at 0% 0%, #3a0050 0%, transparent 50%),
+                radial-gradient(at 100% 0%, #002d3a 0%, transparent 50%),
+                radial-gradient(at 50% 100%, #1a0040 0%, transparent 70%);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
+            /* DİQQƏT: PC-də mərkəzləşdirmə üçün FLEX sətirləri SİLİNDİ! */
+            padding-top: 20px;
+        }
+
+        .container {
+            background: #1e1e1e;
+            padding: 40px 20px; 
+            border-radius: 20px;
+            max-width: 900px; /* PC ÜÇÜN GENİŞLİK */
+            width: 90%; /* TELEFON ÜÇÜN */
+            text-align: center;
+            box-sizing: border-box; 
+            margin: 0 auto; /* <--- PC-də tam mərkəzləşdirmənin açarı! */
+            margin-bottom: 50px; 
+        }
+        
+        h1 {
+            color: #ffffff;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .welcome {
+            font-size: 18px; 
+            margin-bottom: 25px;
+            color: #676363; 
+            font-weight: 500;
+        }
+        
+        .trusted { color: #787474; font-size: 16px; margin-bottom: 15px; }
+        .rating { font-size: 22px; margin-bottom: 15px; }
+
+        /* ========================================= */
+        /* 2. MƏHSUL QUTULARI STİLİ */
+        /* ========================================= */
+        .product {
+            background: #1e1e1e;
+            margin: 15px 0;
+            border-radius: 15px;
+            transition: transform 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .product:hover {
+            transform: scale(1.03);
+        }
+
+        .product .product-img {
+            /* Şəkil yolu düzgün olsa da, faylın Git-də olduğuna əmin olun */
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .product-info-overlay {
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        .product-info-overlay h2 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .product-info-overlay .price {
+            font-size: 18px; 
+            color: #cadfdd;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .product-info-overlay .stock {
+            font-size: 14px; 
+            color: #ddd9daef;
+            display: inline-block;
+        }
+
+        .buy-btn {
+            background: #03dac6;
+            color: #121212;
+            border: none;
+            padding: 10px 25px; 
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 15px auto 0; 
+            display: block;
+            transition: background 0.3s ease;
+            font-weight: bold;
+        }
+
+        .buy-btn:hover {
+            background: #018786;
+        }
+
+        /* ========================================= */
+        /* 3. SOSİAL SİDEBAR STİLİ */
+        /* ========================================= */
+        .social-sidebar {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            z-index: 1000;
+        }
+        
+        .social-sidebar a {
+            background: #121212;
+            color: #bb86fc;
+            padding: 10px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 24px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background 0.3s ease;
+            border: 1px solid #bb86fc;
+        }
+        
+        .social-sidebar a:hover {
+            transform: scale(1.1);
+            background: #bb86fc;
+            color: #121212;
+        }
+        
+        /* ========================================= */
+        /* 4. XÜSUSİYYƏTLƏR VƏ RƏYLƏR */
+        /* ========================================= */
+        .features h2, .reviews h2 {
+            color: white;
+            font-weight: bold;
+            margin: 40px 0 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .feature {
+            color: #ffffff; 
+            margin: 12px 0;
+            font-size: 16px;
+            position: relative;
+            padding-left: 30px;
+            text-align: left;
+        }
+
+        .feature::before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .review {
+            background: #2c2c2c;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            font-style: italic;
+            text-align: left;
+        }
+        
+        .review p {
+            color: #ffffff; 
+            margin: 5px 0;
+        }
+
+        .review p:last-child {
+            color: #ffffff;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .reviews > p {
+            color: #ffffff;
+            font-weight: bold;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        /* ========================================= */
+        /* 5. SÜRÜŞMƏ ŞƏKİLLƏRİ ANİMASİYASI */
+        /* ========================================= */
+        .scrolling-images-container {
+            overflow: hidden; 
+            margin: 30px auto 0 auto;
+            max-width: 600px; 
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            background: #1e1e1e;
+            padding: 10px 0;
+        }
+
+        .scrolling-images {
+            display: flex;
+            width: fit-content; 
+            animation: scroll-right 15s linear infinite; 
+        }
+
+        .scroll-image {
+            width: 200px; 
+            height: 150px; 
+            margin: 0 5px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes scroll-right {
+            0% {
+                transform: translateX(0); 
+            }
+            100% {
+                transform: translateX(-50%); 
+            }
+        }
+        
+        /* ========================================= */
+        /* 6. MODAL VƏ DƏSTƏK STİLLƏRİ */
+        /* ========================================= */
+        .download-btn {
+            background: #121212;
+            color: #ffffff;
+            border: 2px solid #03dac6;
+            padding: 15px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin: 40px auto;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            display: block;
+            width: fit-content;
+            text-decoration: none; 
+        }
+
+        .download-btn:hover {
+            background: #03dac6;
+            color: #121212;
+            border-color: #03dac6;
+        }
+
+        .support p { color: #ffffff; margin-top: 5px; font-size: 15px; }
+        .support a { color: #bb86fc !important; text-decoration: none; font-weight: bold; }
+
+        footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #828282;
+            padding-bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Modal stil */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); padding-top: 60px; }
+        .modal-content { background-color: #1e1e1e; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close:hover { color: white; cursor: pointer; }
+        #payment-element { margin-bottom: 20px; }
+        #submit-payment { background: #03dac6; color: #121212; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    
+    <div class="social-sidebar">
+        <a href="https://discord.gg/uREkzYvK" title="Discord"><i class="fab fa-discord"></i></a> 
+        <a href="https://youtube.com/@niko-wi8hz?si=l2HRGPOjnf5r4cK3" title="YouTube"><i class="fab fa-youtube"></i></a> 
+        <a href="https://www.tiktok.com/@nikocheee8?_r=1&_t=ZS-91zrOtwgQe8" title="TikTok"><i class="fab fa-tiktok"></i></a>
+    </div>
+
+    <div class="container">
+        <h1>NIKO PYTHON CHEAT Store</h1>
+        <p class="welcome">Xoş gəlmisiniz! Free Fire panelləri ani çatdırılma ilə.</p>
+        <p class="trusted">Trusted by 1K+ customers</p>
+        <p class="rating">🌟🌟🌟🌟🌟</p>
+
+        <div class="product internal-panel"> 
+            <img src="images/nikoo.png" alt="Internal Panel" class="product-img"> 
+            <div class="product-info-overlay">
+                <h2>Internal Panel</h2>
+                <p class="price">6.99 dollardan başlayır</p>
+                <p class="stock">52 anbarda var</p>
+                <a href="https://wa.me/994507688797?text=Internal%20Panel%20almaq%20ist%C9%99yir%C9%99m." class="buy-btn" target="_blank">Buy Now</a>
+            </div>
+        </div>
+
+        <div class="product fake-lag-panel">
+            <img src="images/niko-temp.png" alt="Fake Lag Panel" class="product-img">
+            <div class="product-info-overlay">
+                <h2>Fake Lag Panel</h2>
+                <p class="price">4.99 dollardan başlayır</p>
+                <p class="stock">13 anbarda var</p>
+                <a href="https://wa.me/994507688797?text=Fake%20Lag%20Panel%20almaq%20ist%C9%99yir%C9%99m." class="buy-btn" target="_blank">Buy Now</a>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>Xüsusiyyətlər</h2>
+            <p class="feature">Instant delivery: Sifariş ani emailə göndərilir.</p>
+            <p class="feature">24/7 support: Hər zaman kömək.</p>
+            <p class="feature">Warranty: Zəmanətsiz, amma keyfiyyətli.</p>
+            <p class="feature">Community: Alışdan sonra qrupumuza qoşulun.</p>
+        </div>
+        
+        <div class="reviews">
+            <h2>Xoşbəxt Müştərilər</h2>
+            <div class="review">
+                <p>“"Mən bu məhsulu sıfır gözlənti ilə aldım və o, məni bütün mümkün yollarla heyrətə gətirdi. İndi al!"”</p>
+                <p>- ! Sako Forever✔</p>
+            </div>
+            <p>4.3/5.0 — 510 feedback</p>
+            
+            <div class="scrolling-images-container">
+                <div class="scrolling-images track">
+                    <img src="images/nik.png" alt="Müştəri 1" class="scroll-image">
+                    <img src="images/8797.jpg" alt="Müştəri 2" class="scroll-image">
+                    <img src="images/nik.png" alt="Müştəri 3" class="scroll-image">
+                    <img src="images/nikoo.png" alt="Müştəri 4" class="scroll-image">
+                    
+                    <img src="images/nik.png" alt="Müştəri 1" class="scroll-image">
+                    <img src="images/8797.jpg" alt="Müştəri 2" class="scroll-image">
+                    <img src="images/nik.png" alt="Müştəri 3" class="scroll-image">
+                    <img src="images/nikoo.png" alt="Müştəri 4" class="scroll-image">
+                </div>
+            </div>
+        </div>
+        
+        <a href="status.html" class="download-btn">Paneli Yükləyin</a>
+
+        <div class="support">
+            <p>24/7 Dəstək: <a href="https://discord.gg/uREkzYvK" style="color: #bb86fc;">Discord</a></p>
+            <p>Email: support@niko.store</p>
+        </div>
+        
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 NIKO Store. Bütün hüquqlar qorunur.</p>
+        <p>Qanuni: Yalnız əyləncə üçün. Oyun qaydalarına uyğun olun.</p>
+    </footer>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p>Ödəniş Məntiqi</p>
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/693423c537fc4e197cdb7b5c/1jbpqnfb6';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    
+    <script>
+        const stripe = Stripe('pk_test_YourPublicKeyHereFromStripe'); 
+        let elements, paymentElement, currentProduct, currentPrice;
+        function openModal(product, price) {
+            currentProduct = product;
+            currentPrice = price;
+            document.getElementById('paymentModal').style.display = 'block';
+            createPaymentIntent();
+        }
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            if (paymentElement) paymentElement.unmount();
+        }
+        async function createPaymentIntent() {
+            // Server tərəfində işləməlidir. Hazırda WhatsApp linkləri aktivdir.
+        }
+    </script>
+
+</body>
+</html>

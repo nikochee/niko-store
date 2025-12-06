@@ -1,0 +1,16 @@
+# Əməliyyat Sistemlərinin və Redaktorların Faylları (Ümumi)
+.DS_Store
+Thumbs.db
+*.bak
+*.swp
+*~
+.idea/
+.vscode/
+
+# Node.js/Paket Faylları (Əgər gələcəkdə istifadə etsəniz)
+node_modules/
+package-lock.json
+
+# Ətraf Mühit Faylları (Həssas Məlumatları gizlətmək üçün)
+.env
+.env.local
